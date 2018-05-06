@@ -1,0 +1,152 @@
+Dim cnt As Integer
+
+Private Sub CommandButton2_Click()
+
+    If TextBox1.Value = "" Then
+        MsgBox ("Please enter an MFG number")
+        Exit Sub
+    End If
+  
+     mfgLength = Len(TextBox1.Value)
+    
+    If mfgLength < 5 Then
+        MsgBox ("MFG is too short" & vbNewLine & "Please enter a valid MFG")
+        Exit Sub
+    ElseIf mfgLength = 5 Then
+        If Not IsNumeric(TextBox1.Value) Then
+            MsgBox ("Please enter a valid MFG")
+            Exit Sub
+        End If
+    ElseIf mfgLength = 6 Then
+        If Not IsNumeric(TextBox1.Value) Then
+            MsgBox ("Please enter a valid MFG")
+            Exit Sub
+        End If
+    ElseIf mfgLength = 7 Then
+        hyphenCheck = Mid(TextBox1.Value, 6, 1)
+        letterCheck = Right(TextBox1.Value, 1)
+        If hyphenCheck <> "-" Then
+            MsgBox ("Please enter a valid MFG")
+            Exit Sub
+        ElseIf IsLetter(letterCheck) = False Then
+            MsgBox ("Please enter a valid MFG")
+            Exit Sub
+        End If
+    ElseIf mfgLength = 8 Then
+        hyphenCheck = Mid(TextBox1.Value, 7, 1)
+        letterCheck = Right(TextBox1.Value, 1)
+        If hyphenCheck <> "-" Then
+            MsgBox ("Please enter a valid MFG")
+            Exit Sub
+        ElseIf IsLetter(letterCheck) = False Then
+            MsgBox ("Please enter a valid MFG")
+            Exit Sub
+        End If
+    ElseIf mfgLength > 8 Then
+        MsgBox ("This MFG is too long" & vbNewLine & _
+            "Do not include 'MFG' when you type the MFG number")
+        Exit Sub
+    End If
+
+    If TextBox2.Value = "" Then
+        MsgBox ("Please enter the quantity being moved to QC")
+        Exit Sub
+    ElseIf Not IsNumeric(TextBox2.Value) Then
+        MsgBox ("Do not type letters in the quantity being moved to QC")
+        Exit Sub
+    End If
+    
+    cont = 0
+    If OptionButton1.Value = True Then
+        inspectionType = OptionButton1.Caption
+        cnt = 1
+    ElseIf OptionButton2.Value = True Then
+        inspectionType = OptionButton2.Caption
+        cnt = 1
+    ElseIf OptionButton3.Value = True Then
+        inspectionType = OptionButton3.Caption
+        cnt = 1
+    ElseIf OptionButton4.Value = True Then
+        inspectionType = OptionButton4.Caption
+        cnt = 1
+    End If
+    
+    If cnt = 0 Then
+        MsgBox "Please select an inspection type"
+        Exit Sub
+    End If
+
+    If TextBox3.Value = "" Then
+        MsgBox ("Please enter the customer name")
+        Exit Sub
+    End If
+    
+    If TextBox4.Value = "" Then
+        MsgBox ("Please enter the due date")
+        Exit Sub
+    ElseIf IsDate(TextBox4.Value) = False Then
+        MsgBox ("Please enter a valid date" & vbNewLine _
+            & "Make sure to include the forward slash symbol")
+        Exit Sub
+    End If
+
+    mfgNumber = "MFG" & TextBox1.Value
+    qtyMoved = TextBox2.Value
+    customer = TextBox3.Value
+    dueDate = TextBox4.Value
+
+    Sheet2.Visible = xlSheetVisible
+    Sheet2.Activate
+    m = ActiveSheet.UsedRange.Rows.Count
+    For i = 1 To m
+        If Cells(i, 3).Value = mfgNumber Then
+            check = MsgBox("This MO has already been entered" & vbNewLine _
+                & "Are you sure you want to proceed?", vbYesNo, "MO already queued")
+            If check = vbNo Then
+                Exit Sub
+            End If
+        End If
+    Next i
+    Sheet2.Visible = xlSheetHidden
+                
+    Unload Me
+    verify.Show
+
+End Sub
+
+Private Sub Image1_Click()
+
+    Unload Me
+    MainMenu.Show
+
+End Sub
+
+Private Sub TextBox4_MouseDown(ByVal Button As Integer, ByVal Shift As Integer, ByVal X As Single, ByVal Y As Single)
+    
+    If StrComp(TextBox4.Value, "MM/DD/YYYY", vbTextCompare) = 0 Then
+        TextBox4.Value = ""
+    End If
+    
+End Sub
+
+Private Sub UserForm_Initialize()
+
+    If saveInfo = 1 Then
+        TextBox1.Value = mfgNumber
+        TextBox2.Value = qtyMoved
+        TextBox3.Value = customer
+        TextBox4.Value = dueDate
+        saveInfo = 0
+    End If
+
+    TextBox4.Value = "MM/DD/YYYY"
+
+End Sub
+
+Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
+
+    If CloseMode = 0 Then
+        Cancel = True
+    End If
+
+End Sub
